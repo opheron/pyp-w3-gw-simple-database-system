@@ -1,5 +1,7 @@
 from .config import *
+from .exceptions import *
 import os
+import pickle
 
 def create_database(db_name):
     # check if file exists:
@@ -12,21 +14,28 @@ def create_database(db_name):
     # Make sure there isn't an existing DB file present then create one
     if not os.path.isfile(filepath):
         with open(filepath, "w+") as db_file:
-            return Database(db_name)
+            my_db = Database(db_name, filepath)
+            pickle.dump(my_db, db_file)
+            return Database(db_name, filepath)
     else: # We've alredy got a DB file, exit
-        raise DatabaseExists()
+        raise ValidationError('Database with name "' + db_name + '" already exists.')
         
     ### return Database()
 # db = create_database(db_name)
 
 def connect_database(db_name):
-    raise NotImplementedError()
+    filepath = os.path.join(BASE_DB_FILE_PATH, db_name) + ".dat"
+    with open(filepath, "r+") as db_file: 
+        db = pickle.load(db_file)
+        return db
 
 class Database(object):
-    def __init__(self, database_name):
+    def __init__(self, database_name, filepath):
         self.database_name = database_name
-        #self.database = {}
+        self.filepath = filepath
         self.table_list = []
+    
+
         
         
     # def count(self, table_name):
@@ -37,15 +46,16 @@ class Database(object):
         
                                         
     def create_table(self, table_name, columns):
-        setattr(self, table_name, Table(table_name, columns))
+        setattr(self, table_name, Table(table_name, columns, self))
         self.table_list.append(table_name)
         
         # write var table to file
         
 class Table(object):
     
-    def __init__(self, name, columns):
+    def __init__(self, name, columns, db_object):
         self.name = name
+        self.db_object = db_object
         self.columns= columns
         self.data = []
     
@@ -53,7 +63,20 @@ class Table(object):
         return len(self.data)
 
     def insert(self, *args):
-        self.data.append(list(args))
+        if len(args) != len(self.columns):
+            raise ValidationError('Invalid amount of field')
+        else:    
+            self.data.append(list(args))
+            filepath = self.db_object.filepath
+            with open(filepath, "r+") as db_file:
+                pickle.dump(self.db_object, db_file)
+        
+    def describe(self):
+        return self.columns
+        
+    # def all(self):
+    #     for datum in self.data:
+    #         yield datum
         
     #db = Database("blah")
     #db.count()
