@@ -25,29 +25,40 @@ def connect_database(db_name):
 class Database(object):
     def __init__(self, database_name):
         self.database_name = database_name
-        self.database = {}
-
-    def create_table(self, table_name, columns):
-        table = {   "name": table_name,
-                    "columns": columns,
-                    "data": []
-        }
+        #self.database = {}
+        self.table_list = []
         
-        setattr(self, table_name, table)
+        
+    # def count(self, table_name):
+    #     return len(self.table_name["data"])
+    
+    def show_tables(self):
+        return self.table_list
+        
+                                        
+    def create_table(self, table_name, columns):
+        setattr(self, table_name, Table(table_name, columns))
+        self.table_list.append(table_name)
         
         # write var table to file
         
-    def count(self, table_name):
-        return len(self.table_name["data"])
+class Table(object):
+    
+    def __init__(self, name, columns):
+        self.name = name
+        self.columns= columns
+        self.data = []
+    
+    def count(self):
+        return len(self.data)
+
+    def insert(self, *args):
+        self.data.append(list(args))
         
     #db = Database("blah")
     #db.count()
     #want db.authors.count(#)
-    def add_count_method(self, table_name):
-        temp_table = table_name
-        setattr(self.temp_table, 'count', count)
 
-    
 
             # self.db.create_table('authors', columns=[
             # {'name': 'id', 'type': 'int'},
