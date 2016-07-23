@@ -74,21 +74,6 @@ class Table(object):
     def describe(self):
         return self.columns
         
-    # def all(self):
-    #     for datum in self.data:
-    #         yield datum
-        
-    #db = Database("blah")
-    #db.count()
-    #want db.authors.count(#)
-
-
-            # self.db.create_table('authors', columns=[
-            # {'name': 'id', 'type': 'int'},
-            # {'name': 'name', 'type': 'str'},
-            # {'name': 'birth_date', 'type': 'date'},
-            # {'name': 'nationality', 'type': 'str'},
-            # {'name': 'alive', 'type': 'bool'},
-
-        #self.db.authors.insert(1, 'Jorge Luis Borges', date(1899, 8, 24), 'ARG', False)
-        #self.db.authors.insert(2, 'Edgard Alan Poe', date(1809, 1, 19), 'USA', False)
+    def all(self):
+        for datum in self.data:
+            yield datum
